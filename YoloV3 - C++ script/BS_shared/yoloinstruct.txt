@@ -1,0 +1,51 @@
+sudo xmutil unloadapp
+sudo xmutil loadapp kv260-smartcam
+
+export DISPLAY=:1
+xhost +local:root
+
+docker run \
+--env="DISPLAY=$DISPLAY" \
+-h "xlnx-docker" \
+--env="XDG_SESSION_TYPE=$XDG_SESSION_TYPE" \
+--net=host \
+--privileged \
+--volume="$HOME/.Xauthority:/root/.Xauthority:rw" \
+-v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+-v /dev:/dev \
+-v /sys:/sys \
+-v /etc/vart.conf:/etc/vart.conf \
+-v /lib/firmware/xilinx:/lib/firmware/xilinx \
+-v /run:/run \
+-v /home/ubuntu/BS_shared:/mnt/compartido:rw \
+-it xilinx/smartcam:2022.1 bash
+
+mkdir -p  /opt/xilinx/kv260-smartcam/share/vitis_ai_library/models/yolov3_coco_416_tf2/
+cp /mnt/compartido/yolov3_coco_416_tf2.xmodel /mnt/compartido/yolov3_coco_416_tf2.prototxt /mnt/compartido/label.json /mnt/compartido/custom_yolov3_video /mnt/compartido/debrec.h264 /opt/xilinx/kv260-smartcam/share/vitis_ai_library/models/yolov3_coco_416_tf2/
+
+cd /opt/xilinx/kv260-smartcam/share/vitis_ai_library/models/yolov3_coco_416_tf2/
+mkdir yolov3_coco_416_tf2
+mv yolov3_coco_416_tf2.* label.json yolov3_coco_416_tf2/
+
+./custom_yolov3_video ./yolov3_coco_416_tf2 debrec.h264 640 360
+
+./custom_yolov3_video ./yolov3_coco_416_tf2 /dev/video0 640 480
+
+-----
+#compile new cpp
+cd /mnt/compartido
+bash build.sh
+
+se require instalar previamente lo siguiente:
+apt update
+apt install -y libopencv-dev pkg-config
+apt install -y build-essential
+apt install -y libgoogle-glog-dev
+apt install -y libprotobuf-dev protobuf-compiler
+apt install -y libjson-c-dev
+
+apt-get install -y libgtk-3-dev
+
+
+
+
