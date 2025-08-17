@@ -1,8 +1,0 @@
-{
-    "lib": "libvart-dpu-runner.so",
-    "filename": "yolov3_coco_416_tf2.xmodel",
-    "kernel": [
-        "subgraph_quant_add"
-    ],
-    "target": "DPUCZDX8G_ISA1_B3136"
-}
